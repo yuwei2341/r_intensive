@@ -1,11 +1,9 @@
-% Introduction to R (Intensive)
-% [Chris Krogslund](http://ckro.gs); [Political Science](http://polisci.berkeley.edu) // [D-Lab](http://dlab.berkeley.edu) // [UC Berkeley](http://www.berkeley.edu/)
-% [ckrogslund@berkeley.edu](mailto:ckrogslund@berkeley.edu)
+# Introduction to R (Intensive)
+**[Chris Krogslund](http://ckro.gs)**
 
+[Political Science](http://polisci.berkeley.edu) // [D-Lab](http://dlab.berkeley.edu) // [UC Berkeley](http://www.berkeley.edu/)
 
-
-
-# Where we're going...
+**[ckrogslund@berkeley.edu](mailto:ckrogslund@berkeley.edu)**
 
 # Where we're going...
 - R as an Object-oriented Programming Language
