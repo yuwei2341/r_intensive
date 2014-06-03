@@ -1,0 +1,2196 @@
+% Introduction to R (Intensive)
+% [Chris Krogslund](http://ckro.gs); [Political Science](http://polisci.berkeley.edu) // [D-Lab](http://dlab.berkeley.edu) // [UC Berkeley](http://www.berkeley.edu/)
+% [ckrogslund@berkeley.edu](mailto:ckrogslund@berkeley.edu)
+
+```{r chunksetup, include=FALSE} 
+# include any code here you don't want to show up in the document,
+# e.g. package and dataset loading
+rm(list=ls())
+library(plyr)
+library(reshape2)
+library(ggplot2)
+library(lattice)
+library(gridExtra)
+data<-read.csv(file="datasets/cpds.csv")
+setwd(dir="/Users/ChristopherKrogslund/Documents/D-Lab/Teaching/D-Lab R Intensive 2014-06")
+```
+
+# Where we're going...
+
+# Where we're going...
+- R as an Object-oriented Programming Language
+- The R and R Studio Environments
+- Arithmetic and Logical Operations
+- Assignment Operators
+- Object Classes
+- Navigating and Subsetting Objects
+- Programming (Functions, Conditional Execution)
+- Importing data
+- Summarizing data, group-wise operations
+- Causal Inference
+- Graphics
+
+# R and Object-oriented Programming (OOP)
+
+- A good way to introduce OOP is through a simple example that uses Microsoft Excel
+
+![](figure/excel.png)
+
+- Here, we see two main components: a) some data (the values in the spreadsheet), and b) a request to compute an average (applied to the data in column B, rows 2 through 6)
+- One can think of of these components more generally as, respectively, a) an object, and b) a function
+- An **object** is a facility that stores data or information, while a **function** is a prescribed set of actions that will be applied to one or more aspects of an object
+    - Note that a function can also be considered an object
+- R and other OOPs abstract from environments like those seen in Excel (or Stata, etc.), allowing users to flexibly construct, manipulate, and deploy many, many objects and functions at the same time
+- Learning how to use R is all about **learning how to work with different types of R objects and functions**, and then eventually using these lessons to further your own research and statistical needs
+
+# The R and RStudio Environments
+
+- Essential Elements:
+    - Console (R/RStudio)
+    - Scripts (R/RStudio)
+    - Environment/History (RStudio)
+    - Files/Plots/Packages/Help (RStudio)    
+- Tab Completion
+- Highlight and In-line Execution
+
+# Getting Help
+
+- Internal R methods include `help()` or `?`, as well as `??`
+- [Google](http://www.google.com)
+
+# Arithmetic and Boolean Operations
+
+- R can act just like a scientific computer, via very predictable commands
+- These commands can be roughly divided between those that are **arithmetic** (yielding numerical results) and those that are **boolean** (yielding logical results)
+- Arithmetic examples:
+```{r, eval=FALSE}
+4+5
+4-5
+4*5
+4/5
+
+log(4)
+exp(4)
+sin(4)
+cos(4)
+tan(4)
+sqrt(4)
+
+max(4,5,6)
+min(4,5,6)
+sum(4,5,6)
+prod(4,5,6)
+```
+- Boolean examples:
+```{r, eval=FALSE}
+4==5
+4!=5
+!4==5
+
+4>5
+4!>5 # Caution!
+!4>5
+
+4>=5
+4!>=5 # Caution
+!4>=5
+
+4<5
+4!<5 # Caution
+!4<5
+
+4<=5
+4!<=5 # Caution
+!4<=5
+
+4 %in% c(4,5,6)
+!4 %in% c(4,5,6)
+4 %in% c(5,6)
+!4 %in% c(5,6)
+```
+
+# Assignment Operators
+
+- Though R can carry out the same operations as a calculator, what sets it apart is its ability to store calucated results (or any data or information) as objects
+- Three main assignment operators are used to populate objects: 
+1) `<-`
+2) `->`
+3) `=`
+- Conventional use is of the format `objectname <- objectdata`
+```{r, eval=FALSE}
+mysum<-4+5
+simple.division<-4/5
+```
+- Several semi-complex naming conventions apply to object names, but you generally won't have a problem if your object names a) **start with letters** and b) **only use . and _ from the punctuation marks**
+- Numbers are fine, so long as they do not begin the object name
+```{r, eval=FALSE}
+15myobject<-4+5
+myobject<-4+5
+```
+- The vast majority of punctuation marks are reserved for other operations (~, !, @, #, $, %, &, *, ;, ', ?, |)
+```{r, eval=FALSE}
+$myobject<-4+5
+myobject<-4+5
+```
+- Note also that object names and data in R are case-sensitive
+```{r, eval=FALSE}
+myobject<-4+5
+print(MYOBJECT)
+print(myobject)
+```
+
+# Assignment Operators/Concatenation
+
+- Often we want to assign multiple value to an object
+- To do this, we need to use the concatenation operator, or `c()`
+
+```{r}
+mynumbers<-c(4,5,6)
+print(mynumbers)
+```
+
+- We can also take advantage of some shortcuts for assigning a large number of values to an object, or when our values of interest following a particular pattern
+
+```{r}
+4:10
+4:100
+seq(0, 100, 10)
+seq(0, 100, 5)
+rep(6, times=10)
+rep(c(1:5), times=10)
+rep(c(1:5), each=10)
+```
+
+# Object Classes
+
+- In OOP languages like R, objects that take a certain form or have particular attributes can be assigned to a class
+- The class of an object acts like a shortcut for many functions, allowing them to carry out certain calculations that are only appropriate for objects of a certain kind
+- The most prominent object classes in R include:
+1) Numeric
+2) Character
+3) Factor
+4) Logical
+5) Missing/Non-numeric/Null
+```{r, eval=FALSE}
+x<-4+5
+class(x)
+is.numeric(x)
+
+y<-"New York"
+class(y)
+is.character(y)
+is.numeric(y)
+
+z<-factor(x=c("New York", "New Jersey"), ordered=T)
+print(z)
+class(z)
+is.factor(z)
+is.character(z)
+
+a<-TRUE
+is.logical(a)
+is.character(a)
+is.factor(a)
+
+b<-NA
+class(b)
+is.na(b)
+is.numeric(b)
+
+c<-0/0
+class(c)
+print(c)
+is.nan(c)
+is.na(c)
+
+d<-5/0
+class(d)
+is.infinite(d)
+
+e<-NULL
+class(e)
+is.null(e)
+is.numeric(e)
+```
+
+# Object Classes/Data Structures
+
+- There are six basic data structures in R, or classes of objects that are commonly used to store data, namely:
+1) **Atomic Vectors** -- a single piece of data
+```{r, eval=FALSE}
+x<-3
+print(x)
+y<-"New York"
+print(y)
+```
+2) **Vectors** -- a uni-dimensional ordered collection of class-homogenous data
+```{r, eval=FALSE}
+x<-c(3, 4, 9, 10)
+print(x)
+y<-c("New York", "New Jersey", "New Mexico")
+print(y)
+z<-c(1, 2, "a", "b")
+print(z)
+class(z)
+as.numeric(z)
+```
+3) **Matrices** -- a two-dimensional ordered collection of class-homogenous data
+```{r, eval=FALSE}
+x<-matrix(data=1:100, nrow=10)
+print(x)
+y<-matrix(data=c(1, 2, "a", "b"), nrow=2)
+print(y)
+```
+4) **Arrays** -- a generalized n-dimensional ordered collection of class-homogenous data
+```{r, eval=FALSE}
+x<-array(data=1:300, dim=c(10,10,3))
+print(x)
+```
+5) **Data Frames** -- a two-dimensional ordered collection of class-heterogenous data
+```{r, eval=FALSE}
+x<-data.frame(c(1,2), c("a", "b"))
+print(x)
+x<-data.frame(col1=c(1,2), col2=c("a", "b"))
+print(x)
+class(x)
+class(x[,1])
+class(x[,2])
+```
+6) **Lists** -- a generalized n-dimensional ordered collection of class-heterogenous data
+```{r, eval=FALSE}
+x<-list(3, 
+        c(3, 4, "a", "b"), 
+        matrix(data=1:100, nrow=10), 
+        array(data=1:300, dim=c(10,10,3)),
+        data.frame(col1=c(1,2), col2=c("a", "b")))
+print(x)
+x<-list(myatomic.vector=3, 
+        the.vector=c(3, 4, "a", "b"), 
+        some.matrix=matrix(data=1:100, nrow=10), 
+        another.array=array(data=1:300, dim=c(10,10,3)),
+        onemore.data.frame=data.frame(col1=c(1,2), col2=c("a", "b")))
+print(x)
+class(x)
+class(x[[2]])
+class(x[[3]])
+class(x[[4]])
+class(x[[5]])
+```
+
+# Navigating Objects/Indexing
+
+- Often we're not interested in looking at the entirety of an object, but rather at specific attributes or subsets of that object
+- All individual pieces of data in an R object are assigned an index, whose dimensionality is object specific (e.g. a cell in a matrix will have a two-component index, or a data point in a six-dimensional array will have a six-component index)
+- This index can be used to isolate aspects of R objects via brackets
+```{r, eval=FALSE}
+x<-4:10
+print(x)
+x[1]
+x[5]
+x[3:5]
+x[-c(1, 7)]
+
+x<-matrix(data=1:100, nrow=10)
+print(x)
+x[4,5]
+x[1,9]
+x[4,]
+x[,10]
+x[-1,]
+x[,-1]
+x[,-c(8,9,10)]
+
+x<-array(data=1:300, dim=c(10,10,3))
+print(x)
+x[8,7,2]
+x[8,7,]
+x[8,,2]
+x[,,-c(1,2)]
+x[,,3]
+
+x<-data.frame(some.trait=1:5, 
+              some.other.trait=c("a", "b", "c", "d", "e"),
+              third.trait=c(T, T, F, F, T))
+print(x)
+x[1,]
+x[,1]
+x[-3,]
+x$some.trait
+x$third.trait
+x[,"some.trait"]
+x[,"third.trait"]
+x[,1]
+x[,3]
+
+x<-list(myatomic.vector=3, 
+        the.vector=c(3, 4, "a", "b"), 
+        some.matrix=matrix(data=1:100, nrow=10), 
+        another.array=array(data=1:300, dim=c(10,10,3)),
+        onemore.data.frame=data.frame(col1=c(1,2), col2=c("a", "b")))
+print(x)
+x[1]
+x[[1]]
+x$myatomic.vector
+x[-c(1:3)]
+x[[5]]
+x[[5]][,1]
+x[[5]]$col2
+```
+
+# Navigating Objects/Conditional Subsetting
+
+- Instead of inspecting aspects of an object based on their index, we often like to inspect only those aspects of a data object that satisfy certain conditions
+- R allows us to do this by constructing a boolean object (containing only TRUE or FALSE for each element of an object) and only returning those object elements whose boolean positional analog is TRUE
+```{r, eval=FALSE}
+x<-data.frame(some.trait=1:5, 
+              some.other.trait=c("a", "b", "c", "d", "e"),
+              third.trait=c(T, T, F, F, T))
+print(x)
+x$some.trait>=3
+x[x$some.trait>=3,]
+x$some.other.trait %in% c("a", "b")
+x[x$some.other.trait %in% c("a", "b"),]
+
+x<-data.frame(some.trait=1:5, 
+              some.other.trait=c("a", "b", "c", "d", "e"),
+              third.trait=c(T, T, NA, F, T))
+is.na(x)
+x[is.na(x)]
+x[is.na(x)]<-T
+print(x)
+```
+
+# Programming/Functions/Architecture
+
+- R's functional architecture is built around 4 essential components:
+1) Name
+2) Arguments
+3) Content/Body
+4) Return
+- The basic format looks like this:
+```{r, eval=F}
+function.name<-function(argument1, argument2){
+  
+  "Content/Body"
+  "e.g." 
+  "object<-argument1*(1-argument2)"
+  
+  return(object)
+  
+}
+```
+
+**Example #1: Missing Letters** 
+
+```{r}
+missing.letters1<-function(text){
+  
+  data.split<-strsplit(x=text, split="")    # Split the text into letters
+  data.split<-unlist(data.split)    # Convert the above result from a list to a vector
+  data.split<-tolower(data.split)   # Convert all letter to lowercase
+  data.split<-unique(data.split)    # Keep only the unique letters
+  data.split<-data.split[data.split!=" "]   # Get rid of spaces
+  missing<-letters[!letters %in% data.split] # Find the letters that are NOT in the text 
+  
+  return(missing) # Return the missing letters
+}
+
+missing.letters1(text="All we have to fear is fear itself")
+missing.letters1(text="Supercalifragilisticexpialidocious")
+```
+
+Or, slightly more compressed:
+
+```{r}
+missing.letters2<-function(text){
+  
+  data.split<-unique(tolower(unlist(strsplit(x=text, split=""))))
+  missing<-letters[!letters %in% data.split[data.split!=" "]]
+
+  return(missing)
+}
+
+identical(missing.letters1(text="some text"), 
+          missing.letters2(text="some text"))
+```
+
+# Programming/Functions/Multi-argument Return
+
+- Sometimes we want to write functions that return more than one argument.  The way you'd probably think to do it first won't work.
+- For instance, suppose we want to also know the number of unique characters in each string, in addition to the letters that don't appear.
+
+```{r}
+missing.letters2<-function(text){
+  
+  data.split<-unique(tolower(unlist(strsplit(x=text, split=""))))
+  missing<-letters[!letters %in% data.split[data.split!=" "]]
+  
+  num.unique.letters<-length(data.split)
+
+  return(missing, num.unique.letters)
+}
+
+missing.letters2(text="Supercalifragilisticexpialidocious")
+
+```
+
+- In theory, R functions don't permit multi-argument returns.  What we need to do is "trick" R into returning multiple arguments by handing it a sort of Matryoshka doll.  The easiest way to do this is to put all our desired return arguments into **a list**, and then have our function return the list.
+
+For example:
+
+```{r}
+missing.letters2<-function(text){
+  
+  data.split<-unique(tolower(unlist(strsplit(x=text, split=""))))
+  missing<-letters[!letters %in% data.split[data.split!=" "]]
+  
+  num.unique.letters<-length(data.split)
+
+  mylist<-list(missing, num.unique.letters)
+  
+  return(mylist)
+}
+
+missing.letters2(text="Supercalifragilisticexpialidocious")
+
+```
+
+- We can then access particular return arguments using list subsetting:
+
+```{r}
+example.list<-missing.letters2(text="Supercalifragilisticexpialidocious")
+# Get the first element of the list
+example.list[[1]]
+# Get the second element of the list
+example.list[[2]]
+```
+
+# Programming/Functions/Conditional Execution
+
+- An essential element of programming in any language is the use of **conditional execution statements**, more commonly known as if/else statements.  The syntax for these in R is pretty straight forward, taking the basic form of:
+
+```{r, eval=FALSE}
+if(condition) true.action else false.action
+```
+
+- Some examples with **vectors of length == 1**:
+```{r}
+x<-10
+
+if(x<10) "fine" else "also fine"
+if(x>=10) x*100 else 50/x
+if(x<10){
+  y<-2*x
+  c("really great", y)
+} else{
+  y<--2*x
+  c("really not great", y)
+}
+```
+
+- Things fall apart, however, when we deal with **vectors of length > 1**:
+```{r}
+x<-8:12
+
+if(x<10) "fine" else "also fine"
+if(x>=10) x*100 else 50/x
+if(x<10){
+  y<-2*x
+  c("really great", y)
+} else{
+  y<--2*x
+  c("really not great", y)
+}
+```
+
+- For vectors of length > 1, we need to be sure to vectorize our conditional execution statements (meaning, they must be instructed to evaluate objects element-by-element).  R has three basic facilities for doing this: **ifelse()**, **for loops**, and the family of **apply functions**
+
+# Programming/Functions/Conditional Execution/ifelse()
+
+Basic usage:
+
+```{r, eval=FALSE}
+ifelse(test=, yes=, no=)
+```
+
+```{r}
+x=8:12
+
+ifelse(test=x<10, yes="fine", no="also fine")
+ifelse(test=x>=10, yes=x*100, no=50/x)
+ifelse(test=x<10, yes={y<-2*x
+                       3*y}, no={y<--2*x
+                                 3*y})
+```
+
+# Programming/Functions/Conditional Execution/for loops
+
+Basic usage:
+
+```{r, eval=FALSE}
+storage.object<-NULL
+for(element in object.containing.elements){
+  storage.object[element.index]<-operation(element)
+}
+```
+
+For example [note a) the vectorization, and b) the storage]
+```{r}
+out<-NULL
+for(i in 1:length(x)){
+  if(x[i]<10){
+    y<-2*x[i]
+    out[i]<-3*y
+  } else{
+    y<--2*x[i]
+    out[i]<-3*y
+  }
+}
+print(out)
+```
+
+# Programming/Functions/Conditional Execution/VERSUS
+
+```{r, eval=F}
+x<-1:100000
+
+time.ifelse<-system.time(ifelse(test=x<10, yes={y<-2*x
+                       3*y}, no={y<--2*x
+                                 3*y}))
+out<-NULL
+time.forloop<-system.time(for(i in 1:length(x)){
+  cat(i, "\n")
+  if(x[i]<10){
+    y<-2*x[i]
+    out[i]<-3*y
+  } else{
+    y<--2*x[i]
+    out[i]<-3*y
+  }
+}) 
+
+time.forloop/time.ifelse
+```
+
+# Useful Stuff: Applied Research Edition
+
+- For most applied researchers, "useful stuff" that can be done in R boils down to a few core items: 
+
+a) ***Importing*** different types of data from different sources
+b) ***Summarizing*** the structure and content of data
+c) Carrying out operations and calculations across ***groups*** 
+d) ***Reshaping*** data to and from various formats
+e) Attempting to conduct ***causal inference*** 
+
+# Importing data/spreadsheets 
+
+- For spreadsheet data that **is not** explicitly saved as a Microsoft Excel file:
+```{r, eval=FALSE}
+# Import data with header row, values separated by ",", decimals as "."
+data<-read.csv(file="  ", stringsAsFactors=) # Basic Call
+```
+```{r}
+# Example
+cpds.data<-read.csv(file="datasets/cpds_comma.csv", stringsAsFactors=F) 
+dim(cpds.data) # Check dimensionality of dataset
+cpds.data[1:5, 1:5] # View first 5 rows/columns
+```
+```{r, eval=FALSE}
+# Import data with header row, values separated by ";", decimals as ","
+data<-read.csv2(file="  ", stringsAsFactors=)
+
+# Import data with header row, values separated by tab, decimals as "."
+data<-read.delim(file="  ", stringsAsFactors=)
+
+# Import data with header row, values separated by tab, decimals as ";"
+data<-read.delim2(file="  ", stringsAsFactors=)
+
+# For importing tabular data with maximum customizeability
+data<-read.table(file=, header=, sep=, quote=, dec=, fill=, stringsAsFactors=)
+```
+
+- For spreadsheet data that **is** explicitly saved as a Microsoft Excel file (.xls or .xlsx):
+```{r, message=FALSE}
+# Install the "gdata" package (only necessary one time)
+# install.packages("gdata") # Not Run
+
+# Load the "gdata" package (necessary every new R session)
+library(gdata)
+```
+```{r, eval=FALSE}
+# For importing both .xls and .xlsx files
+data<-read.xls(xls=, sheet=) # Basic Call
+```
+```{r}
+# Example with .xls (single sheet)
+cpds.data<-read.xls(xls="datasets/cpds_excel_old.xls") 
+cpds.data[1:5, 1:5]
+# Example with .xlsx (single sheet)
+cpds.data<-read.xls(xls="datasets/cpds_excel_new.xlsx") 
+cpds.data[1:5, 1:5]
+```
+
+# Importing data/proprietaries (e.g.: .dta, .spss, .ssd)
+
+```{r, eval=FALSE}
+# Install the "foreign" package (only necessary one time)
+# install.packages("foreign") # Not Run
+
+# Load the "foreign" package (necessary every new R session)
+library(foreign)
+
+read.xxxx(file=) # Basic call, where .xxxx is the imported file's extension/client
+
+# For importing Stata files
+data<-read.dta(file=)
+```
+```{r}
+# Example
+cpds.data<-read.dta(file="datasets/cpds_stata.dta")
+cpds.data[1:5, 1:5]
+```
+```{r, eval=FALSE}
+# For importing SPSS files
+data<-read.spss(file=)
+
+# For importing SAS files
+data<-read.ssd(file=)
+data<-read.xport(file=)
+
+# For importing Fortran files
+data<-read.fortran(file=)
+
+# For importing DBF files
+data<-read.dbf(file=)
+```
+
+# Importing data/urls (e.g.: http, https, ftp)
+
+- Most data importing facilities in R can be adapted to import non-local files via http/s/ftp
+- For instance, [this online dataset](http://www.quandl.com/DISASTERCENTER-US-Disaster-Center/RATES-US-Crime-Rates-per-100-000-persons)
+```{r}
+# Import crime dataset from Quandl
+link<-"http://www.quandl.com/api/v1/datasets/DISASTERCENTER/RATES.csv"
+crime.data<-read.csv(file=link)
+crime.data[1:25, 1:5]
+```
+
+# Importing data/other (e.g.: html tables, html, xml, json) 
+
+- Say we wanted to scrape a list of votes in the US Congress contained in an html table (like [this](http://clerk.house.gov/evs/2014/ROLL_000.asp))
+```{r}
+# Install the "XML" package (only necessary one time)
+# install.packages("XML") # Not Run
+
+# Load the "XML" package (necessary every new R session)
+library(XML)
+```
+```{r, eval=FALSE}
+data<-readHTMLTable(doc=, header=, which=, stringsAsFactors=) # Basic Call
+```
+```{r}
+link<-"http://clerk.house.gov/evs/2014/ROLL_000.asp"
+votes.2014<-readHTMLTable(doc=link, header=T, which=1, stringsAsFactors=F)
+
+dim(votes.2014) # Check data dimensionality
+colnames(votes.2014) # Get column names
+votes.2014[1:25, 1:5]
+```
+
+- Or say we wanted to scrape the content of a web page (for example, [here](http://www.whitehouse.gov/the_press_office/President_Barack_Obamas_Inaugural_Address))
+```{r, message=FALSE}
+# Install the "RCurl" package (only necessary one time)
+# install.packages("RCurl") # Not Run
+
+# Load the "RCurl" and "XML" packages (necessary every new R session)
+library(RCurl)
+library(XML)
+
+link<-"http://www.whitehouse.gov/the_press_office/President_Barack_Obamas_Inaugural_Address"
+speech<-getURL(url=link)
+
+# Optional html parsing (clean file, extract content)
+speech.parsed<-htmlParse(file=speech)
+
+text<-xpathSApply(doc=speech.parsed, path="//div[@id='content']", fun=xmlValue)
+
+# Optional content analysis
+
+# Install the "qdap" package (only necessary one time)
+# install.packages("qdap") # Not Run
+
+# Load the "qdap" package (necessary every new R session)
+library(qdap)
+
+# Convert the text to a data.frame
+text.df<-data.frame(text=text, stringsAsFactors=F)
+
+# Split the text into sentences
+sentences<-sentSplit(dataframe=text.df, text.var="text")
+
+# Compute various polarity (sentiment) statistics 
+polarity.score<-polarity(text.var=sentences$text)
+polarity.score$group[,c("total.sentences", "total.words", "ave.polarity")]
+polarity.score$all[1:20, c("pos.words", "neg.words")]
+```
+
+- Or say we wanted to scrape the content of an RSS feed (XML) (for example, [here](http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml))
+```{r}
+# Specify a link and issue a GET request
+link<-"http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml"
+page<-getURL(url=link)
+
+# Parse the results of the get request as an XML file
+rss.feed<-xmlParse(file=page) # Not printed
+```
+
+- Or say we wanted to import a JSON file
+```{r}
+# Install the "jsonlite" package (only necessary one time)
+# install.packages("jsonlite") # Not Run
+
+# Load the "jsonlite" package (necessary every new R session)
+library(jsonlite)
+
+# Import JSON file, convert to list
+cpds.data<-fromJSON(txt="datasets/cpds_json.txt", simplifyDataFrame=F)
+head(cpds.data)
+# Import JSON file, convert to data.frame
+cpds.data<-fromJSON(txt="datasets/cpds_json.txt", simplifyDataFrame=T)
+head(cpds.data)
+```
+
+# Summarizing data/example dataset
+
+Replication data from Gelman et al., "Rich State, Poor State, Red State, Blue State: What’s the Matter with Connecticut?", *Quarterly Journal of Political Science*, 2007, 2: 345-367
+
+For decades, the Democrats have been viewed as the party of the poor, with the Republicans representing the rich. Recent presidential elections, however, have shown a reverse pattern, with Democrats performing well in the richer blue states in the northeast and coasts, and Republicans dominating in the red states in the middle of the country and the south. Through multilevel modeling of individual- level survey data and county- and state-level demographic and electoral data, we reconcile these patterns.Furthermore, we find that income matters more in red America than in blue America. In poor states, rich people are much more likely than poor people to vote for the Republican presidential candidate, but in rich states (such as Connecticut), income has a very low correlation with vote preference.
+
+```{r}
+library(foreign)
+red.blue<-read.dta("datasets/2004_labeled_processed_race.dta")
+```
+
+# Summarizing data/object structure
+```{r}
+# Get the object class
+class(red.blue)
+# Get the object dimensionality 
+dim(red.blue) # Note this is rows by columns
+# Get the column names
+colnames(red.blue)
+# Get the row names
+rownames(red.blue)[1:50] # Only the first 50 rows
+# View first six rows and all columns
+head(red.blue)
+# View last six rows and all columns
+tail(red.blue)
+# Get detailed column-by-column information
+str(red.blue)
+```
+
+# Summarizing data/object content
+
+- A good place to start with our data is to calculate summary statistics
+
+- ***Caution***: Although we have some inherently ratio (continuous) variables, the authors binned the data to create ordinal variables (e.g.: Age and Income).  *Bonus*: the bins have differing widths.
+
+- Take a look at the variable "age9"
+```{r}
+# View unique values observed in "age9" (note the factor levels)
+unique(x=red.blue$age9)
+```
+
+Binned Age | True Age
+------ | -----
+1|18-24
+2|25-29
+3|30-39 
+4|40-44
+5|45-49
+6|50-59
+7|60-64
+8|65-74
+9|75+
+
+- Some notes on computing summary statistics:
+1) Note that these functions are sensitive to missing values (NA); you should be sure to specify na.rm=T to avoid errors 
+
+```{r}
+# Sample 100 times from the standard normal distribution 
+sample.data<-rnorm(n=100, mean=0, sd=1)
+
+# Add some missing values to the sample
+sample.data[c(1,4,16,64)]<-NA
+
+# Attempt to calculate the sample mean (presence of NAs)
+mean(x=sample.data)
+# Remove missing values from the sample
+sample.data<-sample.data[!is.na(sample.data)]
+
+# Attempt to calculate the sample mean (absence of NAs)
+mean(x=sample.data)
+```
+
+2) These functions are also sensitive to the presence of factor variables; remove the factor levels to avoid errors (usually use one of as.vector(), as.character(), or as.numeric())
+
+```{r}
+# Check for factor levels in "age9"
+is.factor(x=red.blue$age9)
+# Attempt to calculate the sample mean ("age9" is factor)
+mean(x=red.blue$age9, na.rm=T)
+# Remove factor levels in "age9"
+red.blue$age9<-as.numeric(x=red.blue$age9)
+
+# Check that there are no more factor levels in "age9"
+is.factor(x=red.blue$age9)
+# Attempt to calculate the sample mean ("age9" is not factor)
+mean(x=red.blue$age9, na.rm=T)
+```
+
+- Computing some common summary statistics:
+```{r}
+# Mean
+mean(x=as.numeric(red.blue$age9), na.rm=T)
+# Median
+median(x=as.numeric(red.blue$age9), na.rm=T)
+# Standard Deviation
+sd(x=as.numeric(red.blue$age9), na.rm=T)
+# Quartiles
+quantile(x=as.numeric(red.blue$age9), na.rm=T, probs=seq(from=0, to=1, by=0.25))
+# Quintiles
+quantile(x=as.numeric(red.blue$age9), na.rm=T, probs=seq(from=0, to=1, by=0.2))
+# Deciles
+quantile(x=as.numeric(red.blue$age9), na.rm=T, probs=seq(from=0, to=1, by=0.1))
+# Percentiles
+quantile(x=as.numeric(red.blue$age9), na.rm=T, probs=seq(from=0, to=1, by=0.01))
+```
+
+- We could do the same thing for lots of variables, but there is an easier way!
+```{r}
+# Compute standard summary statistics for object "red.blue"
+summary(object=red.blue)
+```
+
+- Unfortunately, the built-in summary methods don't always pickup every statistic of interest (for example, certain frequencies)
+- For this, it is helpful to produce ratios of the lengths of vector subsets
+```{r}
+# Isolate the gender column, remove factor levels
+gender<-as.character(x=red.blue$sex)
+
+# Remove missing values
+gender<-gender[!is.na(gender)]
+
+# View unique values
+unique(gender)
+# Subset the gender vector to include only males
+males<-gender[gender=="male"]
+head(males)
+# Compute the percentage of males using vector lengths
+length(males)
+length(gender)
+length(males)/length(gender)*100
+```
+
+- This can get really complicated really quickly
+- Suppose we wanted to know how voting behavior in the 2004 Presidential Election varies by race
+- That means we have to calculate frequencies as above for each race in {White, Black, Hispanic/Latino, Asian, Other} and each vote choice in {Bush, Kerry, Nader, Other, No Vote}.
+- How to tackle these tabulations?
+
+# Group-wise Operations
+
+All techniques for this problem rely on the ***split-apply-combine*** strategy
+
+**First,** take the data (or some object) and *split* it into smaller datasets on the basis of some variable
+
+Dataset A
+
+x|y|z
+-----|------|-----
+1|1|1
+2|2|1
+3|3|1
+4|1|2
+5|2|2
+6|3|2
+
+Datasets B and C (Dataset A split according to "z") 
+
+x|y|z| | | | | |x|y|z
+-----|------|-----|-----|-----|-----|-----|-----|-----|-----|-----
+1|1|1| | | | | |4|1|2
+2|2|1| | | | | |5|2|2
+3|3|1| || | | |6|3|2
+
+**Second,** apply some function to each one of the smaller datasets/objects 
+
+Example function: *mean* of variables "x" and "y"
+
+Datasets B' and C'
+
+mean(x)|mean(y)|z| | | | | |mean(x)|mean(y)|z
+-----|------|-----|-----|-----|-----|-----|-----|-----|-----|-----
+2|2|1| | | | | |5|2|2
+
+**Third,** combine the results into a larger dataset/object
+
+Datasets B' and C'
+
+mean(x)|mean(y)|z| | | | | |mean(x)|mean(y)|z
+-----|------|-----|-----|-----|-----|-----|-----|-----|-----|-----
+2|2|1| | | | | |5|2|2
+
+Dataset A'
+
+mean(x)|mean(y)|z
+-----|------|-----
+2|2|1
+5|2|2
+
+# Group-wise Operations/plyr
+
+- *plyr* is the go-to package for all your splitting-applying-combining needs
+- Among its many benefits (above base R capabilities):
+a) Don't have to worry about different name, argument, or output consistencies
+b) Easily parallelized 
+c) Input from, and output to, data frames, matricies, and lists
+d) Progress bars for lengthy computation
+e) Informative error messages
+
+```{r}
+# Install the "plyr" package (only necessary one time)
+# install.packages("plyr") # Not Run
+
+# Load the "plyr" package (necessary every new R session)
+library(plyr)
+```
+
+# Group-wise Operations/plyr/selecting functions
+
+- Two essential questions:
+1) What is the class of your input object?
+2) What is the class of your desired output object?
+- If you want to split a **d**ata frame, and return results as a **d**ata frame, you use **dd**ply
+- If you want to split a **d**ata frame, and return results as a **l**ist, you use **dl**ply
+- If you want to split a **l**ist, and return results as a **d**ata frame, you use **ld**ply
+
+# Group-wise Operations/plyr/writing commands
+
+All of the major plyr functions have the same basic syntax
+
+```{r, eval=FALSE}
+xxply(.data=, .variables=, .fun=, ...)
+```
+
+Consider the case where we want to calculate vote choice statistics across race from a data.frame, and return them as a data.frame:
+
+```{r}
+# Check for (and remove) factor levels in "race" and "pres04"
+is.factor(x=red.blue$race)
+red.blue$race<-as.character(x=red.blue$race)
+is.factor(x=red.blue$race)
+is.factor(x=red.blue$pres04)
+# Check the class of the object
+class(red.blue)
+# Using the appropriate plyr function (ddply), compute vote percentages for Kerry (pres04==1), Bush (pres04==2), Nader (pres04==3), and others (pres04==9)
+ddply(.data=red.blue, .variables=.(race), .fun=summarize, 
+      kerry=length(pres04[pres04==1])/length(pres04)*100, 
+      bush=length(pres04[pres04==2])/length(pres04)*100, 
+      nader=length(pres04[pres04==3])/length(pres04)*100, 
+      other=length(pres04[pres04==9])/length(pres04)*100 
+)
+```
+
+Consider the case where we want to calculate vote choice statistics across race from a data.frame, and return them as a list:
+
+```{r}
+dlply(.data=red.blue, .variables=.(race), .fun=summarize, 
+      kerry=length(pres04[pres04==1])/length(pres04)*100, 
+      bush=length(pres04[pres04==2])/length(pres04)*100, 
+      nader=length(pres04[pres04==3])/length(pres04)*100, 
+      other=length(pres04[pres04==9])/length(pres04)*100 
+)
+```
+
+Consider the case where we want to calculate vote choice statistics across race from a list, and return them as a data.frame:
+
+```{r}
+# Split the data.frame into a list on the basis of "race"
+red.blue.race.list<-split(x=red.blue, f=red.blue$race)
+
+# Check the class of the object
+class(red.blue.race.list)
+# Check for list element names
+objects(red.blue.race.list)
+# Compute summary statistics (note: no .variable argument)
+ldply(.data=red.blue.race.list, .fun=summarize, 
+      kerry=length(pres04[pres04==1])/length(pres04)*100, 
+      bush=length(pres04[pres04==2])/length(pres04)*100, 
+      nader=length(pres04[pres04==3])/length(pres04)*100, 
+      other=length(pres04[pres04==9])/length(pres04)*100 
+)
+```
+
+Consider the case where we want to calculate vote choice statistics across race from a list, and return them as a list:
+
+```{r}
+llply(.data=red.blue.race.list, .fun=summarize, 
+      kerry=length(pres04[pres04==1])/length(pres04)*100, 
+      bush=length(pres04[pres04==2])/length(pres04)*100, 
+      nader=length(pres04[pres04==3])/length(pres04)*100, 
+      other=length(pres04[pres04==9])/length(pres04)*100 
+)
+```
+
+# Group-wise Operations/plyr/functions
+
+- plyr can accomodate any user-defined function, but it also comes with some pre-defined functions that assist with the most common split-apply-combine tasks
+- We've already seen **summarize**, which creates user-specified vectors and combines them into a data.frame.  Here are some other helpful functions:
+
+**transform**: applies a function to a data.frame and adds new vectors (columns) to it
+
+```{r}
+# Add a column containing the average age of the race of the individual
+red.blue.transform<-ddply(.data=red.blue, .variables=.(race), .fun=transform,
+      race.avg.age=mean(x=age9, na.rm=T))
+unique(red.blue.transform$race.avg.age)
+```
+
+Note that **transform** can't do transformations that involve the results of *other* transformations from the same call
+
+```{r}
+# Attempt to add new columns that draw on other (but still new) columns
+red.blue.transform<-ddply(.data=red.blue, .variables=.(race), .fun=transform,
+      race.avg.age=mean(x=age9, na.rm=T),
+      race.avg.age.plusone=race.avg.age+1)
+```
+
+For this, we need **mutate**: just like transform, but it executes the commands iteratively so  transformations can be carried out that rely on previous transformations from the same call
+
+```{r}
+# Attempt to add new columns that draw on other (but still new) columns
+red.blue.mutate<-ddply(.data=red.blue, .variables=.(race), .fun=mutate,
+      race.avg.age=mean(x=age9, na.rm=T),
+      race.avg.age.plusone=race.avg.age+1)
+unique(red.blue.mutate$race.avg.age)
+unique(red.blue.mutate$race.avg.age.plusone)
+```
+
+Another very useful function is **arrange**, which orders a data frame on the basis of column contents
+
+```{r}
+# Arrange by "age9", ascending
+red.blue.age<-plyr::arrange(df=red.blue, age9)
+red.blue.age[1:25, 1:5]
+# Arrange by "age9", descending
+red.blue.age<-plyr::arrange(df=red.blue, desc(age9))
+red.blue.age[1:25, 1:5]
+# Arrange by "age9" then "sex"
+red.blue.age.sex<-plyr::arrange(df=red.blue, age9, sex)
+red.blue.age.sex[1:25, 1:5]
+# Arrange by "sex" (descending) then "age9"
+red.blue.sex.age<-plyr::arrange(df=red.blue, desc(sex), age9)
+red.blue.sex.age[1:25, 1:5]
+```
+
+# Group-wise Operations/dplyr
+
+- While plyr is a really great split-apply-combine tool, it can be a little slow when working over very large datasets.  Consider this dataset containing all votes cast by all members of the U.S. House of Representatives since 1990 (roughly 7 million observations).
+
+```{r}
+# CAUTION: this is a really big file
+load(file="datasets/ushouse_votes")
+
+# View first six rows, check dimensionality
+head(ushouse.votes)
+dim(ushouse.votes)
+```
+
+- For extraordinarily large datasets, there is a new iteration of plyr being developed called **dplyr**.  It is built for working with data.frames only and (currently) only accepts summarise(), mutate(), and arrange(), as well as select() for looking at certain variables and filter() for looking at certain rows.
+
+```{r}
+# Install the "dplyr" package (only necessary one time)
+# install.packages("dplyr") # Not Run
+
+# Load the "dplyr" package (necessary every new R session)
+library(dplyr)
+```
+
+```{r, eval=FALSE}
+# Basic syntax for a dplyr call:
+
+#1) Create a tbl (tabular data structure) that groups the data
+data<-group_by(x=, ...)
+
+#2) Execute the pre-defined function
+summarise(.data=, ...)
+```
+
+A side-by-side comparison of ddply and dplyr (with benchmarks):
+```{r}
+# ddply
+time.ddply<-system.time(avg.yea.states.ddply<-ddply(.data=ushouse.votes, .variables=.(state), summarize, avg.yea=mean(x=yea.vote, na.rm=T)))  
+avg.yea.states.ddply
+# dplyr
+state.groups<-group_by(x=ushouse.votes, state)
+time.dplyr<-system.time(avg.yea.states.dplyr<-summarise(.data=state.groups, 
+                                            avg.yea=mean(x=yea.vote, na.rm=T)))
+
+# Compare the execution times (ratio of ddply-to-plyr)
+time.ddply/time.dplyr
+```
+
+# Reshaping Data/reshape2
+
+- Often times, even before we're interested in doing all this group-wise stuff, we need to reshape our data.  For instance, datasets often arrive at your desk in wide (long) form and you need to convert them to long (wide) form.
+
+- Though base R does have commands for reshaping data (including **aggregate**, **by**, **tapply**, etc.), each of their input commands are slightly different and are only suited for specific reshaping tasks.
+
+- The **reshape2** package overcomes these argument and task inconsistencies to provide a simple, relatively fast way to alter the form of a data.frame.  The package contains effectively two commands, and their functions are in their names: **melt** and **cast**
+
+```{r}
+# Install the "reshape2" package (only necessary one time)
+# install.packages("reshape2") # Not Run
+
+# Load the "reshape2" package (necessary every new R session)
+library(reshape2)
+```
+
+# Reshaping Data/reshape2/melt
+
+- melt() is used to convert wide-form data to long-form.  The basic idea is to take your data.frame and melt it down to a minimal number of columns using two essential pieces of information:
+1) **Unit-of-Analysis identifiers**, or columns you *don't* want to melt down
+2) **Characteristic variables**, or columns you *do* want to melt down
+
+```{r, eval=FALSE}
+# Basic Call
+melt(data=, id.vars=, measure.vars=, variable.name=, value.name=)
+```
+
+To see how this works in practice, consider a subset of the "red.blue" data.frame containing only the first 10 rows and 5 columns
+```{r}
+red.blue.subset<-red.blue[1:10, 1:5]
+red.blue.subset
+```
+
+Suppose we wanted to convert this data from its current wide format to an entirely long format.  How to proceed?
+
+**First**, select which columns you want to keep (i.e. not melt).  In this case, I'm interested in having individual voters as my unit of analysis.  Unfortunately, there is no column containing an individual identification number in this data, so I'll just add one as "individual":
+```{r}
+red.blue.subset$individual<-1:nrow(red.blue.subset)
+red.blue.subset
+```
+
+**Second**, select which columns you want to melt.  In this case, I'd like to melt every column except "individual".
+
+With these two pieces of information, I'm ready to melt down the data.frame:
+```{r}
+melt(data=red.blue.subset, id.vars="individual", 
+     measure.vars=c("state", "pres04", "sex", "race", "age9"))
+# If you want to melt ALL columns that aren't ID variables, you can also omit the "measure.vars" argument
+melt(data=red.blue.subset, id.vars="individual")
+```
+
+Note that melt collapses all of the measure variables into two columns: one containing the column/measurement name, the other containing the column/measurement value for that row.  By default, these columns are named "variable" and "value", though they can be customized using the "variable.name" and "value.name" arguments.  For example:
+```{r}
+melt(data=red.blue.subset, id.vars="individual", 
+     measure.vars=c("state", "pres04", "sex", "race", "age9"),
+     variable.name="characteristic",
+     value.name="response")
+```
+
+Note also that one need not melt down all columns that aren't serving as ID columns.  The melted data.frame will only contain the values of the measure variables you select.  For instance:
+```{r}
+red.blue.melt<-melt(data=red.blue.subset, id.vars="individual", 
+     measure.vars=c("pres04", "sex"))
+red.blue.melt
+```
+
+# Reshaping Data/reshape2/cast
+
+- There are two main cast functions in the reshape2 package for converting data from a long format to a wide format: **a**cast() (for producing **a**rrays) and **d**cast() (for producing **d**ata frames)
+
+- The generic call for (d)cast looks like this:
+
+```{r eval=FALSE}
+dcast(data=, formula=xvar1+xvar2 ~ yvar1+yvar2, value.var=, fun.aggregate=)
+```
+
+Some example usages:
+```{r}
+# Original data
+red.blue.subset
+# Cast a data.frame containing the individual column and columns containing the expansion of "age9" on the basis of its unique values
+dcast(data=red.blue.subset, formula=individual~age9, value.var="age9")
+# Previously melted data
+red.blue.melt
+# Cast a new data.frame from melted data.frame containing the individual column and expanding the "variable" column
+dcast(data=red.blue.melt, formula=individual~variable, value.var="value")
+```
+
+# Inference
+
+- Once we've imported our data, summarized it, carried out group-wise operations, and perhaps reshaped it, we may also like to attempt causal inference.
+- This often requires doing the following:
+1) Dealing with missing values
+2) Carrying out Classical Hypothesis Tests
+3) Estimating Regressions
+4) Carryingout Regression Diagnostics
+
+# Inference/Missing Values
+
+- Having missing values can hinder the quality of your inferences for a variety of reasons.  Luckily, statisticians have developed methods for dealing with missing values by imputing missing values.  One of the best packages for this is **Amelia**.
+
+```{r}
+# Install the "Amelia" package (only necessary one time)
+# install.packages("Amelia") # Not Run
+
+# Load the "Amelia" package (necessary every new R session)
+library(Amelia)
+```
+
+Consider the following panel dataset containing economic and demographic data for several African countries over roughly two decades starting in the 1970s.
+```{r}
+data(africa) # Load the "africa" data.set (included in Amelia)
+
+# Check dimensionality, colnames, head, tail, and structure
+dim(africa)
+colnames(africa)
+head(africa)
+tail(africa)
+str(africa)
+```
+
+We can check for missing values in each of the variables by calling summary()
+```{r}
+summary(africa) # Note the missing values in "gdp_pc" and "trade"
+```
+
+A distribution of potential values for these missing values can be imputed using the Amelia package.
+```{r, eval=FALSE}
+# Basic Call
+amelia(x=, m=, ts=, cs=)
+```
+
+For the "africa" dataset:
+```{r}
+# Run 5 imputations
+africa.imputed<-amelia(x=africa, m=5, ts="year", cs="country")
+# Note the class of the resulting object
+class(africa.imputed)
+# Note the many objects it contains 
+objects(africa.imputed)
+# Most important object is likely "imputations" (this contains a list of data.frames with imputed values included).  Must be sure to apply your analyses (e.g. regressions) over each data.frame in the list, and then aggregate the results
+str(africa.imputed$imputations)
+# Can also apply summary methods to objects of class "amelia"
+summary(africa.imputed)
+```
+
+An example of carring out regressions over each of the imputed datasets:
+```{r}
+# Extract the imputed datasets from the amelia object
+datasets<-africa.imputed$imputations
+# Apply the regression over each element of the list
+lapply(X=datasets, FUN=function(x){
+  summary(lm(formula=gdp_pc~infl+trade, data=x))$coefficients
+})
+```
+
+# Inference/Hypothesis Tests
+
+Suppose we have two different samples, A and B, both drawn from the standard normal distribution:
+```{r}
+a<-rnorm(n=5000, mean=0, sd=1)
+b<-rnorm(n=5000, mean=0, sd=1)
+```
+
+Suppose we also have a third sample, C, drawn from the normal distribution with mean=1 and sd=0:
+```{r}
+c<-rnorm(n=5000, mean=1, sd=1)
+```
+```{r, echo=FALSE, fig.cap=" "}
+plot(density(a), col="red", lwd=3, main="Distributions of A, B, & C")
+lines(density(b), col="blue", lwd=3)
+lines(density(c), col="green4", lwd=3)
+legend("topleft", legend=c("A", "B", "C"), col=c("red", "blue", "green4"), lwd=3)
+```
+
+One can test for differences in these distributions in either a) their means using t-tests, or b) their entire distributions using ks-tests
+
+```{r, eval=FALSE}
+# Basic Call
+t.test(x=, y=, var.equal=, conf.level=, formula=)
+ks.test(x=, y=)
+```
+
+```{r}
+t.test(x=a, y=b) # No difference in means
+t.test(x=a, y=c) # Difference in means
+ks.test(x=a, y=b) # No difference in distributions
+ks.test(x=a, y=c) # Difference in distributions
+```
+
+# Inference/Regression
+
+- Running regressions in R is extremely simple, very straightforwd (though doing things with standard errors requires a little extra work)
+
+- Most basic, catch-all regression function in R is *glm*
+
+- *glm* fits a generalized linear model with your choice of family/link function (gaussian, logit, poisson, etc.)
+
+- *lm* is just a standard linear regression (equivalent to glm with family=gaussian(link="identity"))
+
+- The basic glm call looks something like this:
+
+```{r eval=FALSE}
+glm(formula=y~x1+x2+x3+..., family=familyname(link="linkname"), data=)
+```
+
+- There are a bunch of families and links to use (help(family) for a full list), but some essentials are **binomial(link = "logit")**, **gaussian(link = "identity")**, and **poisson(link = "log")**
+
+- Example: suppose we want to regress being an old man on political party identification, income, and religion using a logit model.  The glm call would be something like this:
+
+```{r}
+# Create an indicator for men aged 65 or over
+red.blue$oldman<-ifelse(test=(red.blue$age65=="65 or over" & red.blue$sex=="male"), 
+                        yes=1, no=0)
+
+# Regress being a 65+ year old male on partyid, income, and religion (logit model)
+oldman.reg<-glm(formula=oldman~partyid+income+relign8, 
+                family=binomial(link="logit"), data=red.blue)
+```
+
+- When we store this regression in an object, we get access to several items of interest
+
+```{r}
+# View objects contained in the regression output
+objects(oldman.reg)
+# Examine regression coefficients
+oldman.reg$coefficients
+# Examine regression DoF
+oldman.reg$df.residual
+# Examine regression fit (AIC)
+oldman.reg$aic
+```
+
+- R has a helpful summary method for regression objects
+```{r}
+summary(oldman.reg)
+```
+
+- Can also extract useful things from the summary object (like a matrix of coefficient estimates...)
+
+```{r}
+# Store summary method results
+sum.oldman.reg<-summary(oldman.reg)
+# View summary method results objects
+objects(sum.oldman.reg)
+# View table of coefficients
+sum.oldman.reg$coefficients
+```
+
+- Note that, in our results, R has broken up our variables into their different factor levels (as it will do whenever your regressors have factor levels)
+
+- If your data aren't factorized, you can tell glm to factorize a variable (i.e. create dummy variables on the fly) by writing
+
+```{r, eval=FALSE}
+glm(formula=y~x1+x2+factor(x3), family=family(link="link"), data=)
+```
+
+- There are also some useful shortcuts for regressing on interaction terms:
+
+**x1:x2** interacts all terms in x1 with all terms in x2
+```{r}
+summary(glm(formula=oldman~partyid:income, 
+            family=binomial(link="logit"), data=red.blue))
+```
+
+**x1/*x2** produces the cross of x1 and x2, or x1+x2+x1:x2
+```{r}
+summary(glm(formula=oldman~partyid*income, 
+            family=binomial(link="logit"), data=red.blue))
+```
+
+- Sometimes, there may be considerable uncertainty as to the proper form of the model to be estimated.  For this, one can source the **glm.sim** function from Github using the package **devtools**.
+
+```{r, message=FALSE}
+# Install the "devtools" package (only necessary one time)
+# install.packages("devtools") # Not Run
+
+# Load the "devtools" package (necessary every new R session)
+library(devtools)
+
+# Source the "glm.sim" function from gist 9359460
+source_gist("https://gist.github.com/ckrogs/9359460") 
+```
+
+```{r, eval=FALSE}
+# Basic Call
+glm.sim(data=, dv=, graphs=, graph.best=, robust=, interactions=, quadratics=)
+```
+
+Consider an example with the "africa" dataset.  Suppose we wanted to regress "gdp_pc" on some combination of "infl", "trade", "civlib", and "population", but we were unsure which model best explained the outcome.  **glm.sim** can runs all the possible models and aggregates the results.
+```{r, message=FALSE, fig.cap=" ", warning=FALSE}
+# Remove extraneous columns from the data
+africa.subset<-africa[,c(3:7)]
+
+# Run glm.sim with graphs
+output<-glm.sim(data=africa.subset, dv="gdp_pc", graphs=T)
+
+# Note the objects 
+objects(output)
+
+# Run glm.sim with graphs and the best model 
+output<-glm.sim(data=africa.subset, dv="gdp_pc", graphs=T, graph.best=1)
+output$plot.p
+output$plot.est
+# Run glm.sim with graphs, best model, and robust standard errors
+output<-glm.sim(data=africa.subset, dv="gdp_pc", graphs=T, graph.best=1, robust=T)
+output$plot.p
+output$plot.est
+# Run glm.sim with graphs, best model, and first-order interactions
+output<-glm.sim(data=africa.subset, dv="gdp_pc", graphs=T, graph.best=1, interactions=T)
+output$plot.p
+output$plot.est
+# Run glm.sim with graphs, best model, and quadratic terms
+output<-glm.sim(data=africa.subset, dv="gdp_pc", graphs=T, graph.best=1, quadratics=T)
+output$plot.p
+output$plot.est
+```
+
+# Inferences/Regression Diagnostics
+
+- The package *lmtest* has most of what you'll need to run basic regression diagnostics.
+
+- Breusch-Pagan Test for Heteroscedasticity 
+```{r}
+bptest(oldman.reg)
+```
+
+- Breusch-Godfrey Test for Higher-order Serial Correlation 
+```{r}
+bgtest(oldman.reg)
+```
+
+- Durbin-Watson Test for Autocorrelation of Disturbances
+```{r}
+dwtest(oldman.reg)
+```
+
+- Can also estimate heteroskedasticity/autocorrelation consistent standard errors via *coeftest* and the *sandwich* package
+```{r}
+coeftest(x=oldman.reg, vcov.=vcovHC)
+```
+
+# By way of introduction...
+
+* 3 main facilities for producing graphics in R: **base**, **lattice**, and **ggplot2**
+  * In practice, these facilities are grouped into two camps: "basic" and "advanced"
+* A better formulation: quick/dirty v. involved/fancy
+
+# quick/dirty v. involved/fancy
+
+* Recall that R is an object-oriented programming language
+
+```{r}
+tips<-reshape2::tips # Load dataset on tipping behavior included with reshape2 package
+attributes(tips) # Check attributes of the tips dataset (names, row.names, class)
+# Create an object of class "lm" (linear model), regressing tip on some covariates
+tips.reg<-lm(formula=tip~total_bill+sex+smoker+day+time+size, data=tips)
+attributes(tips.reg) # Check attributes of the tips.reg object (names, class)
+```
+
+* Base graphics often recognizes the object type and will implement specific plot methods
+
+```{r, fig.cap=" "}
+plot(tips) # Calls plotting method for class of tips dataset ("data.frame")
+plot(tips.reg, which=1:2) # Calls plotting method for class of tips.reg objects ("lm"), print first two plots only
+```
+
+* lattice and ggplot2 generally **don't** exhibit this sort of behavior
+```{r, fig.cap=" "}
+xyplot(tips) # Attempt in lattice to automatically plot objects of class "data.frame"
+ggplot(data=tips)+geom_point() # Attempt in ggplot to automatically plot objects of class "data.frame"
+xyplot(tips.reg) # Attempt in lattice to automatically plot objects of class "lm"
+ggplot(data=tips.reg)+geom_point() # Attempt in ggplot to automatically plot objects of class "lm"
+```
+
+* Easiest to cover **base** graphics on its own, but **lattice** and **ggplot2** in tandem 
+
+# The Dataset
+
+* **Comparative Political Data Set I** (Armingeon et al. 2012)
+* Cases: 23 industrialized democracies, 1960-2012
+* Variables: *Government composition* (L-R); *state structure* (federalism, presidentialism, bicameralism, etc.); *macroeconomic indicators* (output, inflation, unemployment, deficit/debt, etc.); *demographics* (population, elderly)
+
+For more info: [http://www.ipw.unibe.ch/content/team/klaus_armingeon/comparative_political_data_sets/index_eng.html](http://www.ipw.unibe.ch/content/team/klaus_armingeon/comparative_political_data_sets/index_eng.html)
+
+A copy of the dataset is available in the file "cpds.csv", which can be read in as:
+
+```{r}
+data<-read.csv(file="datasets/cpds.csv")
+```
+
+# The Dataset, more specifically
+
+```{r}
+attributes(data)[1:2] # Only show the first two attributes of the dataset (column names and object class)
+# There are many variables, so it can be helpful to extract their classes (mostly to check for factors) via a quick for-loop 
+
+classes<-NULL # Create a placeholder for the class output
+
+# for-loop
+for(i in 1:ncol(data)){
+classes<-c(classes, class(data[,i]))
+}
+sort(classes) # Sort the results alphabetically (appears to be some factors, a few integers, and many numerics)
+```
+
+# base
+
+* *Minimal* call takes the following form
+
+```{r, eval=F}
+plot(x=)
+```
+
+* Note that data-bearing arguments of length creater than 1 ("x" in this case) must be *vectorized* in some manner (usually using the '$' column vector method)
+
+```{r, fig.cap=" "}
+plot(x=vturn) # Attempt to plot variable "vturn" without vectorization
+plot(x=data$vturn) # Attempt to plot variable "vturn" with '$' vectorization
+```
+
+* *Basic* call takes the following form
+
+```{r, eval=F}
+plot(x=, y=, type="")
+```
+
+
+# base/type (scatter, line, both)
+
+* The "type" argument accepts the following character indicators
+* "p" -- point/scatter plots (default plotting behavior)
+```{r, fig.cap=" "}
+plot(x=data$year, y=data$realgdpgr, type="p") # Plot Year on x-axis and Real GDP Growth on y-axis
+```
+* "l" -- line graphs
+```{r, fig.cap=" "}
+plot(x=data$year, y=data$realgdpgr, type="l") # Plot Year on x-axis and Real GDP Growth on y-axis
+```
+* "b" -- both line and point plots
+```{r, fig.cap=" "}
+plot(x=data$year, y=data$realgdpgr, type="b") # Plot Year on x-axis and Real GDP Growth on y-axis
+```
+
+# base/type (histograms, density plots)
+
+* Certain plot types require different calls outside of the "type" argument
+* Ex) Histograms
+```{r, fig.cap=" "}
+hist(x=data$vturn) # Plot histogram of voter turnout 
+hist(x=data$vturn, breaks=2) # Plot histogram of voter turnout, with 2 breaks
+hist(x=data$vturn, breaks=50) # Plot histogram of voter turnout, with 50 breaks
+```
+* Ex) Density plots
+```{r, fig.cap=" "}
+vturn.density<-density(x=data$vturn, na.rm=T) # Create a density object (NOTE: be sure to remove missing values)
+class(vturn.density) # Check the class of the object
+vturn.density # View the contents of the object
+plot(x=vturn.density) # Plot the density object
+plot(x=density(x=data$vturn, bw=2, na.rm=T)) # Plot the density object, bandwidth of 2
+plot(x=density(x=data$vturn, bw=.5, na.rm=T)) # Plot the density object, bandwidth of 0.5
+plot(x=density(x=data$vturn, bw=6, na.rm=T)) # Plot the density object, bandwidth of 6
+```
+
+# base/options [labeling]
+
+* Basic call with popular labeling arguments
+```{r, eval=F}
+plot(x=, y=, type="", xlab="", ylab="", main="") 
+```
+* From the previous example
+
+```{r, fig.cap=" "}
+plot(x=data$year, y=data$realgdpgr, type="p", xlab="Year", ylab="Real GDP Growth", main="This Graph is Great") # Add labels for axes and overall plot
+```
+
+# base/options [axis + size scaling]
+
+* Basic call with popular scaling arguments
+```{r, eval=F}
+plot(x=, y=, type="", xlim=, ylim=, cex=)
+```
+* From the previous example
+
+```{r, fig.cap=" "}
+plot(x=data$year, y=data$realgdpgr, type="p") # Create a basic plot
+# Limit the years (x-axis) to between 1976 and 1991
+plot(x=data$year, y=data$realgdpgr, type="p", xlim=c(1976,1991))
+# Limit the years (x-axis) to between 1976 and 1991, increase point size to 2
+plot(x=data$year, y=data$realgdpgr, type="p", xlim=c(1976,1991), cex=2) 
+# Limit the years (x-axis) to between 1976 and 1991, decrease point size to 0.5
+plot(x=data$year, y=data$realgdpgr, type="p", xlim=c(1976,1991), cex=0.5) 
+```
+
+# base/options [graphical parameters]
+
+* Basic call with popular scaling arguments
+```{r, eval=F}
+plot(x=, y=, type="", col="", pch=, lty=, lwd=)
+```
+* Colors
+```{r}
+colors() # View all elements of the color vector
+colors()[179] # View specific element of the color vector
+colors()[179:190] # View a selection of elements from the color vector
+```
+Another option: [R Color Infographic](http://research.stowers-institute.org/efg/R/Color/Chart/ColorsChart1.jpg)
+```{r, fig.cap=" "}
+plot(x=data$year, y=data$realgdpgr, type="p", col=colors()[145]) # or col="gold3"
+plot(x=data$year, y=data$realgdpgr, type="p", col=colors()[624]) # or col="tan4"
+```
+
+* Point Styles and Widths
+
+[A Good Reference](http://www.endmemo.com/program/R/pic/pchsymbols.png)
+
+```{r, fig.cap=" "}
+plot(x=data$year, y=data$realgdpgr, type="p", pch=3) # Change point style to crosses
+plot(x=data$year, y=data$realgdpgr, type="p", pch=15) # Change point style to filled squares
+# Change point style to filled squares and increase point size to 3
+plot(x=data$year, y=data$realgdpgr, type="p", pch=15, cex=3) 
+plot(x=data$year, y=data$realgdpgr, type="p", pch="w") # Change point style to "w"
+# Change point style to "$" and increase point size to 2
+plot(x=data$year, y=data$realgdpgr, type="p", pch="$", cex=2) 
+```
+
+* Line Styles and Widths
+```{r}
+# Create a data.frame containing yearly average Real GDP Growth over all countries
+library(plyr)
+#Split-apply-combine via plyr
+mean.growth<-ddply(.data=data, .variables=.(year), summarize, mean=mean(realgdpgr)) 
+head(mean.growth)
+```
+
+```{r, fig.cap=" "}
+# Line plot with solid line
+plot(x=mean.growth$year, y=mean.growth$mean, type="l", lty=1)
+# Line plot with medium dashed line
+plot(x=mean.growth$year, y=mean.growth$mean, type="l", lty=2)
+# Line plot with short dashed line
+plot(x=mean.growth$year, y=mean.growth$mean, type="l", lty=3)
+# Change line width to 2
+plot(x=mean.growth$year, y=mean.growth$mean, type="l", lty=3, lwd=2)
+# Change line width to 3
+plot(x=mean.growth$year, y=mean.growth$mean, type="l", lty=3, lwd=3)
+# Change line width to 4
+plot(x=mean.growth$year, y=mean.growth$mean, type="l", lty=3, lwd=4)
+```
+
+# base/layering
+
+* Layering is accomplished by plotting succesive commands of "lines()", "points()", etc. after "plot()"
+```{r,}
+# Subset data to create a few data.frames containing data for a single country 
+france.growth<-data[data$country=="France",]
+italy.growth<-data[data$country=="Italy",]
+spain.growth<-data[data$country=="Spain",]
+```
+
+* Successive calls to "plot()" returns two different plots
+```{r, fig.cap=" "}
+# First call to plot
+plot(x=france.growth$year, y=france.growth$realgdpgr, type="l", col="red", lwd=2)
+# Second call to plot
+plot(x=italy.growth$year, y=italy.growth$realgdpgr, type="l", col="blue", lwd=2)
+```
+
+* But using "lines()" for the second and subsequent calls layers the plots
+```{r, fig.cap=" "}
+# First call to plot
+plot(x=france.growth$year, y=france.growth$realgdpgr, type="l", col="red", lwd=2)
+# First call to lines
+lines(x=italy.growth$year, y=italy.growth$realgdpgr, type="l", col="blue", lwd=2)
+# Second call to lines
+lines(x=spain.growth$year, y=spain.growth$realgdpgr, type="l", col="darkgreen", lwd=2)
+```
+
+* The same is true for "points()"
+```{r, fig.cap=" "}
+# First call to plot
+plot(x=france.growth$year, y=france.growth$realgdpgr, type="l", col="red", lwd=2)
+# First call to lines
+lines(x=italy.growth$year, y=italy.growth$realgdpgr, type="l", col="blue", lwd=2)
+# Second call to lines
+lines(x=spain.growth$year, y=spain.growth$realgdpgr, type="l", col="darkgreen", lwd=2)
+# First call to points
+points(x=1986, y=6, pch=13, col=colors()[116])
+# Second call to points
+points(x=1986, y=-1, pch=13, col=colors()[24])
+# Third call to points
+points(x=1966, y=2, pch=13, col=colors()[391])
+# Fourth call to points
+points(x=2008, y=4, pch=13, col=colors()[8])
+```
+
+# base/options [annotations/reference lines/legends]
+
+* Text 
+```{r, fig.cap=" "}
+plot(x=france.growth$year, y=france.growth$realgdpgr, type="l", col="red", lwd=2)
+lines(x=italy.growth$year, y=italy.growth$realgdpgr, type="l", col="blue", lwd=2)
+lines(x=spain.growth$year, y=spain.growth$realgdpgr, type="l", col="darkgreen", lwd=2)
+points(x=1986, y=6, pch=13, col=colors()[116])
+points(x=1986, y=-1, pch=13, col=colors()[24])
+points(x=1966, y=2, pch=13, col=colors()[391])
+points(x=2008, y=4, pch=13, col=colors()[8])
+# First call to text
+text(x=1967, y=-1, labels="No dot here")
+```
+
+* Reference Lines
+```{r, fig.cap=" "}
+plot(x=france.growth$year, y=france.growth$realgdpgr, type="l", col="red", lwd=2)
+lines(x=italy.growth$year, y=italy.growth$realgdpgr, type="l", col="blue", lwd=2)
+lines(x=spain.growth$year, y=spain.growth$realgdpgr, type="l", col="darkgreen", lwd=2)
+points(x=1986, y=6, pch=13, col=colors()[116])
+points(x=1986, y=-1, pch=13, col=colors()[24])
+points(x=1966, y=2, pch=13, col=colors()[391])
+points(x=2008, y=4, pch=13, col=colors()[8])
+text(x=1967, y=-1, labels="No dot here")
+# First call to abline
+abline(v=1980, h=0)
+```
+
+* Legends
+```{r, fig.cap=" "}
+plot(x=france.growth$year, y=france.growth$realgdpgr, type="l", col="red", lwd=2)
+lines(x=italy.growth$year, y=italy.growth$realgdpgr, type="l", col="blue", lwd=2)
+lines(x=spain.growth$year, y=spain.growth$realgdpgr, type="l", col="darkgreen", lwd=2)
+points(x=1986, y=6, pch=13, col=colors()[116])
+points(x=1986, y=-1, pch=13, col=colors()[24])
+points(x=1966, y=2, pch=13, col=colors()[391])
+points(x=2008, y=4, pch=13, col=colors()[8])
+text(x=1967, y=-1, labels="No dot here")
+abline(v=1980, h=0)
+# First call to legend (note the vector position correspondence between each of the argument values)
+legend("topright", legend=c("France", "Italy", "Spain"), col=c("red", "blue", "darkgreen"), lty=c(1,1,1), lwd=c(2,2,2), cex=.8)
+```
+
+# base/tables
+
+* Can form tables of graphs using the "par()" call like so:
+```{r, eval=FALSE}
+par(mrow=c(ncols,nrows))
+```
+
+
+```{r, fig.cap=" "}
+# STEP 1: Call "par() for a 2x2 table"
+par(mfrow=c(2,2))
+
+# STEP 2: Plot #1
+plot(x=france.growth$year, y=france.growth$realgdpgr, type="l", col="red", lwd=2)
+lines(x=italy.growth$year, y=italy.growth$realgdpgr, type="l", col="blue", lwd=2)
+lines(x=spain.growth$year, y=spain.growth$realgdpgr, type="l", col="darkgreen", lwd=2)
+points(x=1986, y=6, pch=13, col=colors()[116])
+points(x=1986, y=-1, pch=13, col=colors()[24])
+points(x=1966, y=2, pch=13, col=colors()[391])
+points(x=2008, y=4, pch=13, col=colors()[8])
+
+# STEP 3: Plot #2
+plot(x=france.growth$year, y=france.growth$realgdpgr, type="l", col="red", lwd=2)
+lines(x=italy.growth$year, y=italy.growth$realgdpgr, type="l", col="blue", lwd=2)
+lines(x=spain.growth$year, y=spain.growth$realgdpgr, type="l", col="darkgreen", lwd=2)
+points(x=1986, y=6, pch=13, col=colors()[116])
+points(x=1986, y=-1, pch=13, col=colors()[24])
+points(x=1966, y=2, pch=13, col=colors()[391])
+points(x=2008, y=4, pch=13, col=colors()[8])
+text(x=1967, y=-1, labels="No dot here")
+
+# STEP 4: Plot #3
+plot(x=france.growth$year, y=france.growth$realgdpgr, type="l", col="red", lwd=2)
+lines(x=italy.growth$year, y=italy.growth$realgdpgr, type="l", col="blue", lwd=2)
+lines(x=spain.growth$year, y=spain.growth$realgdpgr, type="l", col="darkgreen", lwd=2)
+points(x=1986, y=6, pch=13, col=colors()[116])
+points(x=1986, y=-1, pch=13, col=colors()[24])
+points(x=1966, y=2, pch=13, col=colors()[391])
+points(x=2008, y=4, pch=13, col=colors()[8])
+text(x=1967, y=-1, labels="No dot here")
+abline(v=1980, h=0)
+
+# STEP 5: Plot #4
+plot(x=france.growth$year, y=france.growth$realgdpgr, type="l", col="red", lwd=2)
+lines(x=italy.growth$year, y=italy.growth$realgdpgr, type="l", col="blue", lwd=2)
+lines(x=spain.growth$year, y=spain.growth$realgdpgr, type="l", col="darkgreen", lwd=2)
+points(x=1986, y=6, pch=13, col=colors()[116])
+points(x=1986, y=-1, pch=13, col=colors()[24])
+points(x=1966, y=2, pch=13, col=colors()[391])
+points(x=2008, y=4, pch=13, col=colors()[8])
+text(x=1967, y=-1, labels="No dot here")
+abline(v=1980, h=0)
+legend("topright", legend=c("France", "Italy", "Spain"), col=c("red", "blue", "darkgreen"), lty=c(1,1,1), lwd=c(2,2,2), cex=.8)
+```
+
+# Out with the old...
+
+* Base graphics are really great, but they're not like this (created with a single line of code)
+
+<img src="figure/ka_2.jpg" height="800px" width="1000px" />
+  
+  * **lattice** (Deepayan Sarkar, ISI, Delhi)
+
+* **ggplot2** (Hadley Wickham, again)
+
+* Both are built on "grid", both are really huge improvements over base R graphics
+
+* Both also have entire ***books*** written about them (~200-300 pp. each)
+
+# lattice v. ggplot2
+
+* lattice is 
+
+a) faster (though only noticeable over many and large plots) 
+
+b) simpler (at first)
+
+c) better at trellis graphs
+
+d) able to do 3d graphs
+
+* ggplot2 is 
+
+a) generally more elegant
+
+b) more syntactically logical (and therefore simpler, once you learn it)
+
+c) better at grouping
+
+d) able to interface with maps
+
+# Basic usage: lattice
+
+The general call for lattice graphics looks something like this:
+  
+```{r, eval=FALSE}
+graph_type(formula, data=, [options])
+```
+
+The specifics of the **formula** differ for each graph type, but the general format is straightforward
+
+```{r, eval=FALSE}
+y             # Show the distribution of y
+
+y~x           # Show the relationship between x and y 
+
+y~x|A         # Show the relationship between x and y conditional on the values of A
+
+y~x|A*B       # Show the relationship between x and y conditional on the combinations of A and B
+
+z~y*x         # Show the 3D relationship between x, y, and z
+```
+
+# Basic usage: ggplot2
+
+The general call for ggplot2 graphics looks something like this:
+  
+```{r, eval=FALSE}
+ggplot(data=, aes(x=,y=, [options]))+geom_xxxx()+...+...+...
+```
+
+Note that ggplot2 graphs in layers in a *continuing call* (hence the endless +...+...+...), which really makes the extra layer part of the call
+
+```{r, eval=FALSE}
+...+geom_xxxx(data=, aes(x=,y=,[options]),[options])+...+...+...
+```
+You can see the layering effect by comparing the same graph with different colors for each layer
+
+```{r, fig.cap=" ", warning=FALSE}
+ggplot(data=data, aes(x=vturn, y=realgdpgr))+geom_point(color="black")+geom_point(aes(x=vturn, y=unemp), color="red")
+ggplot(data=data, aes(x=vturn, y=realgdpgr))+geom_point(color="red")+geom_point(aes(x=vturn, y=unemp), color="black")
+```
+
+# Comparing lattice and ggplot
+
+* Density Plots
+* Scatter Plots
+* Line Plots
+* Bar plots
+* Box plots
+* Trellis Plots
+* Contour Plots
+* Tile/Image Plots
+* 3D Plots (lattice)
+* Panel Plots (ggplot2)
+
+# lattice v. ggplot2: Densities
+
+```{r, fig.cap=" ", warning=FALSE}
+densityplot(~vturn, data=data) # lattice
+ggplot(data=data, aes(x=vturn))+geom_density() # ggplot2
+```
+
+# lattice v. ggplot2: X-Y scatter plots
+
+```{r, fig.cap=" ", warning=FALSE}
+xyplot(outlays~vturn, data=data) # lattice
+ggplot(data=data, aes(x=vturn, y=outlays))+geom_point() # ggplot2
+```
+
+# lattice v. ggplot2: X-Y line plots
+
+```{r, fig.cap=" ", warning=FALSE}
+xyplot(mean~year, data=mean.growth, type="l") # lattice
+ggplot(data=mean.growth, aes(x=year, y=mean))+geom_line() # ggplot2 
+```
+
+# lattice v. ggplot2: bar plots 
+```{r, fig.cap=" ", warning=FALSE, message=FALSE}
+# Create data.frame of average growth rates by country over time
+growth<-ddply(.data=data, .variables=.(country), summarize, mean=mean(realgdpgr, na.rm=T))
+
+barchart(mean~country, data=growth) # lattice
+ggplot(data=growth, aes(x=country, y=mean))+geom_bar() # ggplot2
+```
+
+# lattice v. ggplot2: box plots 
+```{r, fig.cap=" ", warning=FALSE}
+bwplot(vturn~country, data=data) # lattice
+ggplot(data=data, aes(x=country, y=vturn))+geom_boxplot() # ggplot2
+```
+
+# lattice v. ggplot2: "trellis" plots 
+```{r, fig.cap=" ", warning=FALSE}
+xyplot(vturn~year|country, data=data) # lattice
+ggplot(data=data, aes(x=year, y=vturn))+geom_point()+facet_wrap(~country) # ggplot2
+```
+
+# lattice v. ggplot2: countour plots
+```{r, fig.cap=" ", warning=FALSE}
+data(volcano) # Load volcano contour data
+volcano[1:10, 1:10] # Examine volcano dataset (first 10 rows and columns)
+volcano3d <- melt(volcano) # Use reshape2 package to melt the data
+head(volcano3d) # Examine volcano3d dataset (head)
+names(volcano3d) <- c("xvar", "yvar", "zvar") # Rename volcano3d columns
+contourplot(zvar~xvar+yvar, data=volcano3d) # lattice
+ggplot(data=volcano3d, aes(x=xvar, y=yvar, z = zvar))+geom_contour() # ggplot2
+```
+
+# lattice v. ggplot2: tile/image/level plots
+```{r, fig.cap=" ", warning=FALSE}
+levelplot(zvar~xvar+yvar, data=volcano3d) # lattice
+ggplot(data=volcano3d, aes(x=xvar, y=yvar, z = zvar))+geom_tile(aes(fill=zvar)) # ggplot2
+```
+
+# lattice: 3D plots
+```{r, fig.cap=" ", warning=FALSE}
+# Create a subset of the dataset containing only data for France
+france.data<-data[data$country=="France",]
+cloud(outlays~year*vturn, data=france.data)
+# Create a subset of the dataset containing only data for Greece, Portugal, Ireland, and Spain
+pigs.data<-data[data$country %in% c("Greece", "Portugal", "Ireland", "Spain"),]
+cloud(outlays~year*vturn|country, data=pigs.data)
+```
+
+# ggplot2: Panel plots
+```{r, fig.cap=" ", warning=FALSE}
+ggplot(data=pigs.data, aes(x=year, y=vturn, color=country))+geom_line()
+```
+
+# lattice v. ggplot2: options [labeling]
+
+```{r, fig.cap=" ", warning=FALSE}
+xyplot(outlays~vturn, data=data, xlab="Voter Turnout (%)", ylab="Government Outlays", main="This Graph is Also Great") # lattice
+ggplot(data=data, aes(x=vturn, y=outlays))+geom_point()+xlab(label="Voter Turnout (%)")+ylab(label="Government Outlays")+ggtitle(label="This Graph is Also Also Great") # ggplot2
+```
+
+# lattice v. ggplot2: options [axis + size scaling]
+
+```{r, fig.cap=" ", warning=FALSE}
+xyplot(outlays~vturn, data=data, xlim=c(80,100)) # lattice
+xyplot(outlays~vturn, data=data, xlim=c(80,100), cex=2) # lattice
+xyplot(outlays~vturn, data=data, xlim=c(80,100), cex=.5) # lattice
+ggplot(data=data, aes(x=vturn, y=outlays))+geom_point()+xlim(80,100) # ggplot2
+ggplot(data=data, aes(x=vturn, y=outlays))+geom_point(size=3)+xlim(80,100) # ggplot2
+ggplot(data=data, aes(x=vturn, y=outlays))+geom_point(size=1)+xlim(80,100) # ggplot2
+```
+
+# lattice v. ggplot2: options [graphical parameters]
+
+* Colors
+```{r, fig.cap=" ", warning=FALSE}
+xyplot(outlays~vturn, data=data, col=colors()[145]) #lattice
+xyplot(outlays~vturn, data=data, col="red") #lattice
+ggplot(data=data, aes(x=vturn, y=outlays))+geom_point(color=colors()[145]) # ggplot2
+ggplot(data=data, aes(x=vturn, y=outlays))+geom_point(color="red") # ggplot2
+```
+
+* Point Styles and Widths
+```{r, fig.cap=" ", warning=FALSE}
+xyplot(outlays~vturn, data=data, pch=3) # lattice
+xyplot(outlays~vturn, data=data, pch=15) # lattice
+ggplot(data=data, aes(x=vturn, y=outlays))+geom_point(shape=3) # ggplot2
+ggplot(data=data, aes(x=vturn, y=outlays))+geom_point(shape=15) # ggplot2
+```
+
+* Point Styles and Widths
+```{r, fig.cap=" ", warning=FALSE}
+xyplot(outlays~vturn, data=data, pch=3) # lattice
+xyplot(outlays~vturn, data=data, pch=15) # lattice
+xyplot(outlays~vturn, data=data, pch="w") # lattice
+xyplot(outlays~vturn, data=data, pch="$", cex=2) # lattice
+ggplot(data=data, aes(x=vturn, y=outlays))+geom_point(shape=3) # ggplot2
+ggplot(data=data, aes(x=vturn, y=outlays))+geom_point(shape=15) # ggplot2
+ggplot(data=data, aes(x=vturn, y=outlays))+geom_point(shape="w") # ggplot2
+ggplot(data=data, aes(x=vturn, y=outlays))+geom_point(shape="$", size=5) # ggplot2
+```
+
+* Line Styles and Widths
+```{r, fig.cap=" ", warning=FALSE}
+xyplot(outlays~vturn, data=data, type="l", lty=1) # lattice
+xyplot(outlays~vturn, data=data, type="l", lty=2) # lattice
+xyplot(outlays~vturn, data=data, type="l", lty=3) # lattice
+xyplot(outlays~vturn, data=data, type="l", lty=3, lwd=2) # lattice
+xyplot(outlays~vturn, data=data, type="l", lty=3, lwd=3) # lattice
+xyplot(outlays~vturn, data=data, type="l", lty=3, lwd=4) # lattice
+ggplot(data=data, aes(x=vturn, y=outlays))+geom_line(linetype=1) # ggplot2
+ggplot(data=data, aes(x=vturn, y=outlays))+geom_line(linetype=2) # ggplot2
+ggplot(data=data, aes(x=vturn, y=outlays))+geom_line(linetype=3) # ggplot2
+ggplot(data=data, aes(x=vturn, y=outlays))+geom_line(linetype=3, size=1) # ggplot2
+ggplot(data=data, aes(x=vturn, y=outlays))+geom_line(linetype=3, size=1.5) # ggplot2
+ggplot(data=data, aes(x=vturn, y=outlays))+geom_line(linetype=3, size=2) # ggplot2
+```
+
+# ggplot2 and the Grammar of Graphics
+
+- By now, you might be noticing some trends in how these two packages approach graphics
+
+- lattice tends to focus on a particular type of graph and how to represent cross-sectional variation by splitting it up into smaller chunks
+
+- Becoming a proficient user of lattice requires learning a huge array of graph-specific formulas and options
+
+- ggplot2 tries to represent much more of the cross-sectional variation by making use of various "aesthetics"; general approach is based on *The Grammar of Graphics*
+  
+# ggplot2 and the Grammar of Graphics
+  
+  - Basic idea is that the visualization of all data requires four items
+
+1) One or more **statistics** conveying information about the data (identities, means, medians, etc.)
+
+2) A **coordinate system** that differentiates between the intersections of statistics (at most two for ggplot, three for lattice)
+
+3) **Geometries** that differentiate between off-coordinate variation in *kind*
+  
+  4) **Scales** that differentiate between off-coordinate variation in *degree*
+  
+  - ggplot2 allows the user to manipulate all four of these items
+
+# Anatomy of aes()
+
+```{r, eval=FALSE}
+ggplot(data=, aes(x=, y=, color=, linetype=, shape=, size=))
+```
+
+ggplot2 is optimized for showing variation on all four aesthetic types
+
+```{r, fig.cap=" ", warning=FALSE}
+# Differences in kind using color
+ggplot(data=pigs.data, aes(x=year, y=vturn))+geom_line(aes(color=country))
+```
+
+Note what happens when we specify the color parameter outside of the aesthetic operator. ggplot2 views these specifications as invalid graphical parameters. 
+
+```{r, fig.cap=" ", warning=FALSE}
+ggplot(data=pigs.data, aes(x=year, y=vturn))+geom_line(color=country)
+ggplot(data=pigs.data, aes(x=year, y=vturn))+geom_line(color="country")
+ggplot(data=pigs.data, aes(x=year, y=vturn))+geom_line(color="red")
+```
+
+```{r, fig.cap=" ", warning=FALSE}
+# Differences in kind using line types
+ggplot(data=pigs.data, aes(x=year, y=vturn))+geom_line(aes(linetype=country))
+# Differences in kind using point shapes
+ggplot(data=pigs.data, aes(x=year, y=vturn))+geom_point(aes(shape=country))
+# Differences in degree using color
+ggplot(data=pigs.data, aes(x=year, y=realgdpgr))+geom_point(aes(color=vturn))
+# Differences in degree using point size
+ggplot(data=pigs.data, aes(x=year, y=realgdpgr))+geom_point(aes(size=vturn))
+# Multiple non-cartesian aesthetics (differences in kind using color, degree using point size)
+ggplot(data=pigs.data, aes(x=year, y=realgdpgr))+geom_point(aes(color=country,size=vturn))
+```
+
+# Fitted lines and curves with ggplot2
+```{r, fig.cap=" ", warning=FALSE, message=FALSE}
+ggplot(data=pigs.data, aes(x=year, y=vturn))+geom_point()
+# Add linear model (lm) smoother
+ggplot(data=pigs.data, aes(x=year, y=vturn))+geom_point()+geom_smooth(method="lm")
+# Add local linear model (loess) smoother, span of 0.75 
+ggplot(data=pigs.data, aes(x=year, y=vturn))+geom_point()+geom_smooth(method="loess", span=.75)
+# Add local linear model (loess) smoother, span of 0.25 
+ggplot(data=pigs.data, aes(x=year, y=vturn))+geom_point()+geom_smooth(method="loess", span=.25)
+# Add linear model (lm) smoother, no standard error shading 
+ggplot(data=pigs.data, aes(x=year, y=vturn))+geom_point()+geom_smooth(method="lm", se=F)
+# Add local linear model (loess) smoother, no standard error shading 
+ggplot(data=pigs.data, aes(x=year, y=vturn))+geom_point()+geom_smooth(method="loess", se=F)
+# Add a local linear (loess) smoother for each country
+ggplot(data=pigs.data, aes(x=year, y=vturn))+geom_point(aes(color=country))+geom_smooth(aes(color=country))
+# Add a local linear (loess) smoother for each country, no standard error shading
+ggplot(data=pigs.data, aes(x=year, y=realgdpgr))+geom_point(aes(color=country, size=vturn))+geom_smooth(aes(color=country), se=F)
+```
+
+# lattice v. ggplot2: tables
+
+* Both lattice and ggplot2 graphs can be combined using the *grid.arrange()* function in the **gridExtra** package 
+```{r, warning=FALSE, fig.cap=" "}
+# Initialize gridExtra library
+library(gridExtra)
+# Create 3 plots to combine in a table
+plot1<-ggplot(data=pigs.data, aes(x=year, y=vturn, color=))+geom_line(aes(color=country))
+plot2<-ggplot(data=pigs.data, aes(x=year, y=vturn, linetype=))+geom_line(aes(linetype=country))
+plot3<-ggplot(data=pigs.data, aes(x=year, y=vturn, shape=))+geom_point(aes(shape=country))
+# Call grid.arrange
+grid.arrange(plot1, plot2, plot3, nrow=3, ncol=1)
+```
+
+# Exporting
+
+Two basic image types
+
+1) **Raster/Bitmap** (.png, .jpeg)
+
+Every pixel of a plot contains its own separate coding; not so great if you want to resize the image
+
+```{r, eval=FALSE}
+jpeg(filename="example.png", width=, height=)
+plot(x,y)
+dev.off()
+```
+
+2) **Vector** (.pdf, .ps)
+
+Every element of a plot is encoded with a function that gives its coding conditional on several factors; great for resizing
+
+```{r, eval=FALSE}
+pdf(filename="example.pdf", width=, height=)
+plot(x,y)
+dev.off()
+```
+
+# Exporting with lattice v. ggplot
+
+```{r, eval=FALSE}
+# Assume we saved our plot is an object called example.plot
+
+# lattice
+trellis.device(device="pdf", filename="example.pdf")
+print(example.plot)
+dev.off()
+
+# ggplot2
+ggsave(filename="example.pdf", plot=example.plot, scale=, width=, height=) # ggplot2
+```
+
+# stop()
